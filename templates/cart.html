@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Bag — SoleVault India{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <h1 class="font-heading fw-bold mb-1">SHOPPING BAG</h1>
+    <p class="text-muted small mb-0">Review your authenticated selections before pan-India courier dispatch.</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  {% if cart_items %}
+    <div class="row g-4">
+      <!-- Cart Items Table Col -->
+      <div class="col-lg-8">
+        <div class="cart-table-card mb-4">
+          <div class="d-none d-md-grid grid-header pb-3 border-bottom text-muted small text-uppercase fw-bold" style="grid-template-columns: 90px 1fr 120px 100px 40px; gap: 1.25rem;">
+            <span>Product</span>
+            <span>Details</span>
+            <span class="text-center">Quantity</span>
+            <span class="text-end">Subtotal</span>
+            <span></span>
+          </div>
+
+          {% for item in cart_items %}
+            <div class="p-3 border-bottom d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+              <!-- Left: Image & Details -->
+              <div class="d-flex align-items-center gap-3 flex-grow-1">
+                <div class="cart-item-img flex-shrink-0" style="width: 75px; height: 75px; background: #fff; border-radius: 8px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                </div>
+                <div>
+                  <span class="text-muted text-uppercase small fw-bold d-block" style="font-size: 0.75rem;">{{ item.product.brand.name }}</span>
+                  <a href="{% url 'product_detail' slug=item.product.slug %}" class="fw-bold text-dark d-block mb-1 text-decoration-none">{{ item.product.name }}</a>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-dark border px-2 py-1 small">Size: {{ item.size }}</span>
+                    <span class="text-muted small">₹{{ item.unit_price|floatformat:0 }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Quantity, Subtotal, Remove (Stacked or aligned) -->
+              <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3 gap-md-4 mt-2 mt-md-0 pt-2 pt-md-0 border-top border-top-md-0">
+                <!-- Quantity Controls -->
+                <div class="d-inline-flex align-items-center border rounded-2 bg-light">
+                  <a href="{% url 'update_cart_item' item.id %}?action=decrease" class="btn btn-sm btn-link text-dark text-decoration-none px-2 py-1" aria-label="Decrease quantity">-</a>
+                  <span class="px-2 fw-bold font-heading small">{{ item.quantity }}</span>
+                  <a href="{% url 'update_cart_item' item.id %}?action=increase" class="btn btn-sm btn-link text-dark text-decoration-none px-2 py-1" aria-label="Increase quantity">+</a>
+                </div>
+
+                <!-- Subtotal (₹ INR) -->
+                <div class="text-end" style="min-width: 90px;">
+                  <strong class="font-heading fs-6">₹{{ item.subtotal|floatformat:0 }}</strong>
+                </div>
+
+                <!-- Remove Button -->
+                <div>
+                  <a href="{% url 'remove_from_cart' item.id %}" class="text-muted text-hover-danger p-1 d-inline-block" title="Remove item" onclick="return confirm('Remove this item from your bag?');">
+                    <i class="bi bi-trash3 fs-5"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="{% url 'shop' %}" class="btn btn-vault-outline btn-vault-sm">
+            <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <!-- Order Summary Col -->
+      <div class="col-lg-4">
+        <div class="cart-summary-card">
+          <h5 class="font-heading fw-bold mb-3">ORDER SUMMARY</h5>
+
+          <!-- Free shipping progress -->
+          {% if free_shipping_remaining > 0 %}
+            <div class="alert alert-warning py-2 px-3 small rounded-3 mb-3">
+              <i class="bi bi-truck me-1"></i> Add <strong>₹{{ free_shipping_remaining|floatformat:0 }}</strong> more to unlock <strong>Free Express Courier across India</strong>!
+            </div>
+          {% else %}
+            <div class="alert alert-success py-2 px-3 small rounded-3 mb-3">
+              <i class="bi bi-check-circle-fill me-1"></i> You have unlocked <strong>Free Express Courier Delivery</strong>!
+            </div>
+          {% endif %}
+
+          <div class="summary-row">
+            <span class="text-muted">Bag Subtotal</span>
+            <strong>₹{{ subtotal|floatformat:0 }}</strong>
+          </div>
+
+          {% if discount > 0 %}
+            <div class="summary-row text-success">
+              <span>Promo Discount ({{ coupon.code }})</span>
+              <strong>-₹{{ discount|floatformat:0 }}</strong>
+            </div>
+          {% endif %}
+
+          <div class="summary-row">
+            <span class="text-muted">Estimated Express Shipping</span>
+            <span>{% if shipping == 0 %}<strong class="text-success">FREE</strong>{% else %}₹{{ shipping|floatformat:0 }}{% endif %}</span>
+          </div>
+
+          <div class="summary-row summary-total">
+            <span>Estimated Total (INR)</span>
+            <span class="text-dark">₹{{ grand_total|floatformat:0 }}</span>
+          </div>
+
+          <!-- Coupon Code Box -->
+          <div class="my-4 pt-3 border-top">
+            <label class="font-heading fw-bold small text-uppercase mb-2 d-block">Promotional Code</label>
+            {% if coupon %}
+              <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-2 border">
+                <div>
+                  <span class="badge bg-dark me-2">{{ coupon.code }}</span>
+                  <small class="text-success fw-semibold">Applied</small>
+                </div>
+                <a href="{% url 'remove_coupon' %}" class="btn btn-sm btn-link text-danger p-0 text-decoration-none">Remove</a>
+              </div>
+            {% else %}
+              <form action="{% url 'apply_coupon' %}" method="POST" class="d-flex gap-2">
+                {% csrf_token %}
+                <input type="text" name="code" class="form-control form-control-sm text-uppercase" placeholder="e.g. WELCOME10" required>
+                <button type="submit" class="btn btn-dark btn-sm px-3">Apply</button>
+              </form>
+              <div class="small text-muted mt-2">
+                Try codes: <code class="text-dark fw-bold">WELCOME10</code> or <code class="text-dark fw-bold">SOLE1000</code>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Checkout CTA -->
+          <a href="{% url 'checkout' %}" class="btn btn-vault-gold btn-vault-lg w-100 mb-3">
+            <i class="bi bi-lock-fill me-1"></i> Proceed to Checkout
+          </a>
+
+          <div class="text-center text-muted small">
+            <i class="bi bi-shield-check text-success me-1"></i> 100% Safe UPI & Card Checkout
+          </div>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- Empty Cart State -->
+    <div class="card border-0 bg-white shadow-sm p-5 text-center rounded-4 my-5">
+      <div class="mb-3 text-muted">
+        <i class="bi bi-bag-x fs-1"></i>
+      </div>
+      <h3 class="font-heading fw-bold mb-2">Your shopping bag is empty</h3>
+      <p class="text-muted mb-4" style="max-width: 450px; margin-left: auto; margin-right: auto;">
+        You haven't added any luxury sneakers to your bag yet. Explore our latest drops and timeless icons.
+      </p>
+      <div>
+        <a href="{% url 'shop' %}" class="btn btn-vault btn-vault-lg">Explore All Sneakers</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

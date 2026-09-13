@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}404 — Page Not Found in the Vault | SoleVault{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-5 text-center">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div class="mb-4">
+        <span class="font-heading display-1 fw-bold text-dark d-block">404</span>
+        <span class="badge bg-warning text-dark px-3 py-1 font-heading text-uppercase">LOST GRAIL</span>
+      </div>
+
+      <h2 class="font-heading fw-bold mb-3">THIS PAGE CANNOT BE FOUND IN THE VAULT</h2>
+      <p class="text-muted mb-4">
+        The sneaker, drop, or page you were seeking might have been retired, moved, or completely sold out.
+      </p>
+
+      <!-- Search in 404 -->
+      <form action="{% url 'shop' %}" method="GET" class="mb-4">
+        <div class="input-group input-group-lg border rounded-3 overflow-hidden shadow-sm">
+          <input type="text" name="q" class="form-control border-0 px-3" placeholder="Search for shoes, brands, styles...">
+          <button class="btn btn-vault px-4" type="submit">Search</button>
+        </div>
+      </form>
+
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'home' %}" class="btn btn-vault-outline">
+          <i class="bi bi-house me-1"></i> Return Home
+        </a>
+        <a href="{% url 'shop' %}" class="btn btn-vault">
+          <i class="bi bi-bag-check me-1"></i> Browse All Sneakers
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

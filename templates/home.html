@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SoleVault India — The Next Step In Your Style | Premium Sneaker E-Commerce{% endblock %}
+
+{% block content %}
+<!-- ==========================================
+     HERO BANNER
+     ========================================== -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="hero-subtitle d-inline-block animate-fade-in">
+          <i class="bi bi-stars me-1"></i> SS/26 LUXURY FOOTWEAR DROP // INDIA
+        </span>
+        <h1 class="hero-title animate-fade-in">
+          THE NEXT STEP IN YOUR STYLE.
+        </h1>
+        <p class="hero-desc animate-fade-in">
+          Discover premium sneakers designed for those who move differently. Curated classics, 100% authenticated grails, and cutting-edge silhouettes delivered across India.
+        </p>
+        <div class="d-flex flex-wrap gap-3 animate-fade-in">
+          <a href="{% url 'shop' %}" class="btn btn-vault-gold btn-vault-lg">
+            <i class="bi bi-bag-check-fill me-1"></i> Shop Collection
+          </a>
+          <a href="{% url 'shop' %}?sort=newest" class="btn btn-vault-outline btn-vault-lg text-white border-white">
+            Explore New Arrivals <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-image-wrapper text-center">
+          {% if new_arrivals.0 %}
+            <img src="{{ new_arrivals.0.image.url }}" alt="Featured Sneaker" class="img-fluid drop-shadow">
+          {% else %}
+            <img src="{% static 'images/hero_sneaker.svg' %}" alt="Featured Sneaker" class="img-fluid">
+          {% endif %}
+          <div class="hero-floating-badge text-start d-none d-sm-block">
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded-circle bg-dark text-warning p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                <i class="bi bi-patch-check-fill fs-5"></i>
+              </div>
+              <div>
+                <span class="d-block small text-muted text-uppercase fw-bold letter-spacing-1">Vault Verified India</span>
+                <strong class="font-heading fs-6">100% Guaranteed Authentic</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     BRAND BENEFITS
+     ========================================== -->
+<section class="py-5 bg-white border-bottom">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-3 col-sm-6">
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h5 class="font-heading fs-6 mb-2">Authentic Products</h5>
+          <p class="text-muted small mb-0">Every pair undergoes rigorous physical multi-point inspection by certified sneaker authenticators.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <i class="bi bi-gem"></i>
+          </div>
+          <h5 class="font-heading fs-6 mb-2">Premium Quality</h5>
+          <p class="text-muted small mb-0">Uncompromising materials, buttery Italian leathers, engineered knits, and archival silhouettes.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <i class="bi bi-qr-code-scan"></i>
+          </div>
+          <h5 class="font-heading fs-6 mb-2">UPI & Secure Payments</h5>
+          <p class="text-muted small mb-0">Instant checkout via UPI (Google Pay, PhonePe, Paytm), RuPay, Net Banking, and Cash on Delivery.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="benefit-card">
+          <div class="benefit-icon-wrap">
+            <i class="bi bi-lightning-charge"></i>
+          </div>
+          <h5 class="font-heading fs-6 mb-2">Pan-India Express Delivery</h5>
+          <p class="text-muted small mb-0">Dispatched within 24 hours with signature double-box protection and live Delhivery/BlueDart tracking.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     FEATURED CATEGORIES
+     ========================================== -->
+<section class="py-5 my-3">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-muted text-uppercase small fw-bold letter-spacing-2">Curated Silhouettes</span>
+        <h2 class="font-heading fw-bold mb-0">FEATURED CATEGORIES</h2>
+      </div>
+      <a href="{% url 'shop' %}" class="btn btn-vault-outline btn-vault-sm d-none d-md-inline-flex">
+        View All Categories <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for cat in featured_categories %}
+        <div class="col-lg-{% if forloop.first or forloop.last %}6{% else %}4{% endif %} col-md-6">
+          <div class="category-card">
+            {% if cat.image %}
+              <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="category-card-bg">
+            {% endif %}
+            <div class="category-card-content">
+              <span class="badge bg-white text-dark mb-2 px-3 py-1 font-heading">{{ cat.products.count }} Models</span>
+              <h3 class="category-card-title">{{ cat.name }}</h3>
+              <p class="text-white-50 small mb-3">{{ cat.description|truncatewords:10 }}</p>
+              <a href="{% url 'shop' %}?category={{ cat.slug }}" class="category-card-link">
+                Shop Now <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     NEW ARRIVALS
+     ========================================== -->
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-muted text-uppercase small fw-bold letter-spacing-2">Fresh In The Vault</span>
+        <h2 class="font-heading fw-bold mb-0">NEW ARRIVALS</h2>
+      </div>
+      <a href="{% url 'shop' %}?sort=newest" class="btn btn-vault-outline btn-vault-sm">
+        Explore All New <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-3 g-md-4 row-cols-2 row-cols-md-3 row-cols-lg-4">
+      {% for product in new_arrivals %}
+        <div class="col">
+          <div class="product-card h-100 d-flex flex-column">
+            <!-- Badges -->
+            <div class="product-badges">
+              {% if product.has_discount %}
+                <span class="badge-tag badge-tag-sale">{{ product.discount_percent }}% OFF</span>
+              {% elif product.is_new %}
+                <span class="badge-tag badge-tag-new">NEW DROP</span>
+              {% endif %}
+              {% if product.category.slug == 'limited-edition' %}
+                <span class="badge-tag badge-tag-limited d-none d-sm-inline-block">GRAIL</span>
+              {% endif %}
+            </div>
+
+            <!-- Wishlist Button -->
+            {% if user.is_authenticated %}
+              <button type="button" class="wishlist-btn-corner wishlist-ajax-btn" data-product-id="{{ product.id }}" title="Save to Wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+            {% else %}
+              <a href="{% url 'login' %}?next={{ request.path }}" class="wishlist-btn-corner" title="Login to save">
+                <i class="bi bi-heart"></i>
+              </a>
+            {% endif %}
+
+            <!-- Image -->
+            <a href="{% url 'product_detail' slug=product.slug %}" class="product-card-img-wrap">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+            </a>
+
+            <!-- Content -->
+            <div class="product-card-body d-flex flex-column flex-grow-1">
+              <span class="product-brand">{{ product.brand.name }}</span>
+              <a href="{% url 'product_detail' slug=product.slug %}" class="product-title" title="{{ product.name }}">{{ product.name }}</a>
+              
+              <!-- Ratings -->
+              <div class="d-flex align-items-center gap-1 mb-2 small text-warning">
+                <i class="bi bi-star-fill" style="font-size: 0.75rem;"></i>
+                <span class="text-dark fw-bold ms-1" style="font-size: 0.8rem;">{{ product.average_rating }}</span>
+                <span class="text-muted d-none d-sm-inline" style="font-size: 0.75rem;">({{ product.total_reviews }})</span>
+              </div>
+
+              <!-- Price Box (INR) -->
+              <div class="product-price-box mt-auto">
+                <span class="product-price">₹{{ product.current_price|floatformat:0 }}</span>
+                {% if product.has_discount %}
+                  <span class="product-price-old">₹{{ product.price|floatformat:0 }}</span>
+                {% endif %}
+              </div>
+
+              <!-- Action -->
+              <div class="product-card-actions mt-2">
+                <a href="{% url 'product_detail' slug=product.slug %}" class="btn btn-vault btn-vault-sm w-100 py-1 py-sm-2 text-nowrap">
+                  <i class="bi bi-eye"></i> <span class="d-none d-sm-inline">View</span> Details
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     PROMOTIONAL BANNER
+     ========================================== -->
+<section class="py-5">
+  <div class="container">
+    <div class="promo-banner shadow-lg">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+          <span class="text-warning text-uppercase fw-bold letter-spacing-2 small mb-2 d-inline-block">LIMITED ARCHIVE VAULT</span>
+          <h2 class="font-heading display-5 fw-bold text-white mb-3">FIND YOUR ICONIC PAIR</h2>
+          <p class="text-white-50 fs-5 mb-4 font-light">
+            Step into legendary design with hard-to-find high-tops, authenticated runway drops, and premium daily drivers in India.
+          </p>
+          <a href="{% url 'shop' %}?sort=popular" class="btn btn-vault-gold btn-vault-lg">
+            Shop Best Sellers <i class="bi bi-arrow-right ms-2"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     BEST SELLERS
+     ========================================== -->
+<section class="py-5 bg-white border-top">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-muted text-uppercase small fw-bold letter-spacing-2">Community Favorites</span>
+        <h2 class="font-heading fw-bold mb-0">BEST SELLERS</h2>
+      </div>
+      <a href="{% url 'shop' %}?sort=popular" class="btn btn-vault-outline btn-vault-sm">
+        View All Popular <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for product in best_sellers %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card border-0 shadow-sm rounded-3 overflow-hidden h-100 p-3 bg-light">
+            <div class="row g-3 align-items-center">
+              <div class="col-5">
+                <a href="{% url 'product_detail' slug=product.slug %}">
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded-2 bg-white p-2">
+                </a>
+              </div>
+              <div class="col-7">
+                <span class="text-muted text-uppercase small fw-semibold">{{ product.brand.name }}</span>
+                <h6 class="font-heading fw-bold mb-1">
+                  <a href="{% url 'product_detail' slug=product.slug %}" class="text-dark text-truncate d-block">{{ product.name }}</a>
+                </h6>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <strong class="text-dark fs-6">₹{{ product.current_price|floatformat:0 }}</strong>
+                  {% if product.has_discount %}
+                    <del class="text-muted small">₹{{ product.price|floatformat:0 }}</del>
+                  {% endif %}
+                </div>
+                <a href="{% url 'product_detail' slug=product.slug %}" class="btn btn-vault btn-vault-sm py-1 px-3">
+                  Select Size
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     NEWSLETTER SUBSCRIPTION SECTION
+     ========================================== -->
+<section class="newsletter-section text-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <span class="badge bg-warning text-dark mb-3 px-3 py-1 font-heading">INSIDER ACCESS</span>
+        <h2 class="font-heading text-white fw-bold mb-3">NEVER MISS A VAULT DROP</h2>
+        <p class="text-white-50 mb-4">
+          Subscribe to get confidential early release dates in India, member-only discount codes, and secret vault restock invitations.
+        </p>
+        <form action="{% url 'newsletter_subscribe' %}" method="POST" class="d-flex flex-column flex-sm-row gap-2">
+          {% csrf_token %}
+          <input type="email" name="email" class="form-control form-control-lg bg-dark text-white border-secondary" placeholder="Enter your email address..." required>
+          <button class="btn btn-vault-gold btn-vault-lg px-4" type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

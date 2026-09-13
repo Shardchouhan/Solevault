@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms & Conditions of Service — SoleVault{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Terms & Conditions</li>
+      </ol>
+    </nav>
+    <h1 class="font-heading fw-bold mb-0">TERMS OF SERVICE</h1>
+    <p class="text-muted small mb-0">Last Revised: January 1, 2026</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9 bg-white p-4 p-md-5 rounded-4 shadow-sm">
+      <h5 class="font-heading fw-bold mb-3">1. Agreement to Terms</h5>
+      <p class="text-muted small leading-relaxed mb-4">
+        By accessing or purchasing from SoleVault ("we", "our", or "us"), you agree to abide by these Terms of Service. If you do not agree to all terms, please refrain from using the platform.
+      </p>
+
+      <h5 class="font-heading fw-bold mb-3">2. Product Authenticity & Inspection</h5>
+      <p class="text-muted small leading-relaxed mb-4">
+        All items presented on SoleVault are guaranteed deadstock and 100% authentic. Items undergo multi-point inspection by certified specialists before shipment. Any item returned without its attached, undamaged SoleVault verification tag will be deemed ineligible for refund.
+      </p>
+
+      <h5 class="font-heading fw-bold mb-3">3. Orders, Pricing & Inventory Availability</h5>
+      <p class="text-muted small leading-relaxed mb-4">
+        All prices are listed in US Dollars ($). We reserve the right to limit order quantities on ultra-rare or limited-edition sneaker releases. In the rare circumstance that an item is out of stock due to simultaneous order collisions, a full refund will be processed immediately.
+      </p>
+
+      <h5 class="font-heading fw-bold mb-3">4. Shipping & Delivery</h5>
+      <p class="text-muted small leading-relaxed mb-4">
+        Title and risk of loss pass to the buyer upon courier delivery confirmation. All packages are insured against loss during transit.
+      </p>
+
+      <h5 class="font-heading fw-bold mb-3">5. Governing Law</h5>
+      <p class="text-muted small leading-relaxed mb-0">
+        These Terms are governed by and construed under the laws of the State of New York, United States.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

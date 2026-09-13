@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout — SoleVault India Luxury Footwear{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cart' %}">Bag</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+      </ol>
+    </nav>
+    <h1 class="font-heading fw-bold mb-0">SECURE CHECKOUT // INDIA</h1>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <form method="POST" action="{% url 'checkout' %}">
+    {% csrf_token %}
+    <div class="row g-5">
+      <!-- Shipping & Billing Details Col -->
+      <div class="col-lg-7">
+        <div class="card border-0 bg-white shadow-sm p-4 p-md-5 rounded-4 mb-4">
+          <h4 class="font-heading fw-bold mb-4 pb-2 border-bottom">
+            <i class="bi bi-geo-alt me-2 text-primary"></i> 1. Delivery & Contact Details
+          </h4>
+
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label font-heading fw-bold small">Full Name *</label>
+              {{ form.full_name }}
+              {% if form.full_name.errors %}<div class="text-danger small">{{ form.full_name.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label font-heading fw-bold small">Email Address *</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label font-heading fw-bold small">Mobile Number (for Courier SMS) *</label>
+              {{ form.phone }}
+              {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label font-heading fw-bold small">Street Address, Flat / Building *</label>
+              {{ form.address }}
+              {% if form.address.errors %}<div class="text-danger small">{{ form.address.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label font-heading fw-bold small">City *</label>
+              {{ form.city }}
+              {% if form.city.errors %}<div class="text-danger small">{{ form.city.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label font-heading fw-bold small">State *</label>
+              {{ form.state }}
+              {% if form.state.errors %}<div class="text-danger small">{{ form.state.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label font-heading fw-bold small">PIN Code *</label>
+              {{ form.postal_code }}
+              {% if form.postal_code.errors %}<div class="text-danger small">{{ form.postal_code.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label font-heading fw-bold small">Country *</label>
+              {{ form.country }}
+              {% if form.country.errors %}<div class="text-danger small">{{ form.country.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label font-heading fw-bold small">Delivery Instructions / Landmark (Optional)</label>
+              {{ form.order_notes }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method Box -->
+        <div class="card border-0 bg-white shadow-sm p-4 p-md-5 rounded-4">
+          <h4 class="font-heading fw-bold mb-4 pb-2 border-bottom">
+            <i class="bi bi-qr-code-scan me-2 text-success"></i> 2. Payment Method
+          </h4>
+
+          <div class="mb-3">
+            <label class="form-label font-heading fw-bold small">Choose Payment Mode</label>
+            {{ form.payment_method }}
+          </div>
+
+          <div class="bg-light p-3 rounded-3 border small text-muted">
+            <i class="bi bi-info-circle-fill text-primary me-1"></i>
+            <strong>Indian Payment Gateways:</strong> UPI (Google Pay, PhonePe, Paytm), RuPay / Visa / Mastercard, Net Banking, and Cash on Delivery (COD) are enabled.
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary Col -->
+      <div class="col-lg-5">
+        <div class="cart-summary-card sticky-top" style="top: 100px;">
+          <h4 class="font-heading fw-bold mb-3">YOUR ORDER</h4>
+          
+          <!-- Item list -->
+          <div class="d-flex flex-column gap-3 mb-4 pb-3 border-bottom max-height-300 overflow-auto">
+            {% for item in cart_items %}
+              <div class="d-flex align-items-center gap-3">
+                <div class="position-relative bg-light rounded-2 p-1" style="width: 60px; height: 60px; flex-shrink: 0;">
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid">
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark">
+                    {{ item.quantity }}
+                  </span>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="font-heading fw-bold mb-0 text-truncate" style="max-width: 180px;">{{ item.product.name }}</h6>
+                  <span class="small text-muted">Size: {{ item.size }}</span>
+                </div>
+                <div class="text-end font-heading fw-bold">
+                  ₹{{ item.subtotal|floatformat:0 }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Price summary -->
+          <div class="summary-row">
+            <span class="text-muted">Subtotal</span>
+            <strong>₹{{ subtotal|floatformat:0 }}</strong>
+          </div>
+
+          {% if discount > 0 %}
+            <div class="summary-row text-success">
+              <span>Coupon Discount ({{ coupon.code }})</span>
+              <strong>-₹{{ discount|floatformat:0 }}</strong>
+            </div>
+          {% endif %}
+
+          <div class="summary-row">
+            <span class="text-muted">Express Courier (Pan-India)</span>
+            <span>{% if shipping == 0 %}<strong class="text-success">FREE</strong>{% else %}₹{{ shipping|floatformat:0 }}{% endif %}</span>
+          </div>
+
+          <div class="summary-row summary-total">
+            <span>Total Payable (INR)</span>
+            <span class="text-dark">₹{{ grand_total|floatformat:0 }}</span>
+          </div>
+
+          <!-- Submit Order Button -->
+          <button type="submit" class="btn btn-vault-gold btn-vault-lg w-100 mt-4">
+            <i class="bi bi-bag-check-fill me-1"></i> Place Vault Order (₹{{ grand_total|floatformat:0 }})
+          </button>
+
+          <p class="text-muted small text-center mt-3 mb-0">
+            By clicking "Place Vault Order", you agree to SoleVault India's <a href="{% url 'terms' %}" target="_blank" class="text-decoration-underline">Terms</a> and <a href="{% url 'privacy' %}" target="_blank" class="text-decoration-underline">Privacy Policy</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

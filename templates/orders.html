@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders — SoleVault India{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'profile' %}">Account</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Orders</li>
+      </ol>
+    </nav>
+    <h1 class="font-heading fw-bold mb-0">MY ORDERS</h1>
+  </div>
+</div>
+
+<div class="container pb-5">
+  {% if orders %}
+    <div class="row g-4">
+      {% for o in orders %}
+        <div class="col-12">
+          <div class="card border-0 bg-white shadow-sm rounded-4 p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 border-bottom mb-3">
+              <div>
+                <span class="small text-muted d-block">Order #</span>
+                <strong class="font-heading fs-6 text-dark">{{ o.order_number }}</strong>
+              </div>
+              <div>
+                <span class="small text-muted d-block">Placed On</span>
+                <span class="small fw-semibold text-dark">{{ o.created_at|date:"F d, Y" }}</span>
+              </div>
+              <div>
+                <span class="small text-muted d-block">Total Amount</span>
+                <strong class="font-heading fs-6 text-dark">₹{{ o.total_amount|floatformat:0 }}</strong>
+              </div>
+              <div>
+                <span class="small text-muted d-block">Status</span>
+                <span class="badge {% if o.status == 'Delivered' %}bg-success{% elif o.status == 'Shipped' %}bg-primary{% else %}bg-dark{% endif %} px-3 py-1">
+                  {{ o.status }}
+                </span>
+              </div>
+              <div>
+                <a href="{% url 'order_detail' o.order_number %}" class="btn btn-vault btn-vault-sm">
+                  Order Details <i class="bi bi-chevron-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+
+            <!-- Items preview -->
+            <div class="row g-3 align-items-center">
+              <div class="col-md-8">
+                <div class="d-flex flex-wrap gap-2">
+                  {% for item in o.items.all %}
+                    <div class="d-flex align-items-center gap-2 bg-light p-2 rounded-3 border" style="max-width: 260px;">
+                      <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 40px; height: 40px; object-fit: contain; background: #fff;" class="rounded-2">
+                      <div class="small">
+                        <span class="d-block fw-bold text-truncate" style="max-width: 180px;">{{ item.product.name }}</span>
+                        <span class="text-muted">Size: {{ item.selected_size }} | Qty: {{ item.quantity }}</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="col-md-4 text-md-end small text-muted">
+                <span>Courier Tracking: <strong>{{ o.tracking_number }}</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card border-0 bg-white shadow-sm p-5 text-center rounded-4 my-5">
+      <div class="mb-3 text-muted">
+        <i class="bi bi-box-seam fs-1"></i>
+      </div>
+      <h3 class="font-heading fw-bold mb-2">No past orders found</h3>
+      <p class="text-muted mb-4">You haven't placed any sneaker orders with SoleVault India yet.</p>
+      <div>
+        <a href="{% url 'shop' %}" class="btn btn-vault">Discover Collection</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

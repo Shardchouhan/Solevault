@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmed #{{ order.order_number }} — SoleVault India{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Confirmation Card -->
+      <div class="card border-0 bg-white shadow-lg rounded-4 p-4 p-md-5 text-center mb-4">
+        <div class="rounded-circle bg-success-subtle text-success mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+          <i class="bi bi-check2-all fs-1"></i>
+        </div>
+
+        <span class="text-uppercase fw-bold letter-spacing-2 small text-muted">Order Placed Successfully</span>
+        <h2 class="font-heading fw-bold mb-2">THANK YOU FOR YOUR ORDER</h2>
+        <p class="text-muted mb-4">
+          Your vault order <strong>#{{ order.order_number }}</strong> has been verified for authentication and dispatch. Confirmation details sent to <strong>{{ order.email }}</strong>.
+        </p>
+
+        <!-- Tracking Bar Box -->
+        <div class="bg-light p-3 p-md-4 rounded-3 text-start mb-4 border">
+          <div class="row g-3 align-items-center">
+            <div class="col-sm-6">
+              <span class="small text-muted d-block">Order Number:</span>
+              <strong class="font-heading fs-6 text-dark">{{ order.order_number }}</strong>
+            </div>
+            <div class="col-sm-6">
+              <span class="small text-muted d-block">Courier Tracking ID:</span>
+              <strong class="font-heading fs-6 text-primary">{{ order.tracking_number }}</strong>
+            </div>
+            <div class="col-sm-6">
+              <span class="small text-muted d-block">Order Status:</span>
+              <span class="badge bg-warning text-dark">{{ order.status }}</span>
+            </div>
+            <div class="col-sm-6">
+              <span class="small text-muted d-block">Payment Method:</span>
+              <strong class="font-heading fs-6 text-dark">{{ order.payment_method }} ({{ order.payment_status }})</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Itemized Receipt -->
+        <div class="text-start mb-4">
+          <h5 class="font-heading fw-bold mb-3 pb-2 border-bottom">Items in this Package</h5>
+          <div class="d-flex flex-column gap-3">
+            {% for item in order.items.all %}
+              <div class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light">
+                <div class="d-flex align-items-center gap-3">
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="rounded-2" style="width: 60px; height: 60px; object-fit: contain; background: #fff; padding: 4px;">
+                  <div>
+                    <h6 class="font-heading fw-bold mb-0">{{ item.product.name }}</h6>
+                    <span class="small text-muted">Size: {{ item.selected_size }} | Qty: {{ item.quantity }}</span>
+                  </div>
+                </div>
+                <div class="font-heading fw-bold fs-6">
+                  ₹{{ item.subtotal|floatformat:0 }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Financial Breakdown (₹ INR) -->
+        <div class="text-start mb-4 p-3 bg-light rounded-3 border">
+          <div class="d-flex justify-content-between py-1 small">
+            <span class="text-muted">Subtotal:</span>
+            <strong>₹{{ order.subtotal|floatformat:0 }}</strong>
+          </div>
+          {% if order.discount_amount > 0 %}
+            <div class="d-flex justify-content-between py-1 small text-success">
+              <span>Discount Applied:</span>
+              <strong>-₹{{ order.discount_amount|floatformat:0 }}</strong>
+            </div>
+          {% endif %}
+          <div class="d-flex justify-content-between py-1 small">
+            <span class="text-muted">Express Courier:</span>
+            <strong>{% if order.shipping_cost == 0 %}FREE{% else %}₹{{ order.shipping_cost|floatformat:0 }}{% endif %}</strong>
+          </div>
+          <div class="d-flex justify-content-between pt-2 mt-2 border-top">
+            <strong class="font-heading fs-5">Total Paid:</strong>
+            <strong class="font-heading fs-5 text-dark">₹{{ order.total_amount|floatformat:0 }}</strong>
+          </div>
+        </div>
+
+        <!-- Shipping Destination -->
+        <div class="text-start mb-4">
+          <h6 class="font-heading fw-bold mb-2">Delivery Destination:</h6>
+          <p class="text-muted small mb-0">
+            {{ order.full_name }}<br>
+            {{ order.address }}<br>
+            {{ order.city }}, {{ order.state }} - {{ order.postal_code }}<br>
+            {{ order.country }}<br>
+            Phone: {{ order.phone }}
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+          <button onclick="window.print()" class="btn btn-vault-outline">
+            <i class="bi bi-printer me-1"></i> Print Tax Invoice
+          </button>
+          <a href="{% url 'shop' %}" class="btn btn-vault">
+            <i class="bi bi-bag-check me-1"></i> Continue Shopping
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

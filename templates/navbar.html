@@ -1,0 +1,149 @@
+<nav class="navbar navbar-expand-lg vault-navbar sticky-top">
+  <div class="container">
+    <!-- Brand Logo -->
+    <a class="navbar-brand navbar-brand-text" href="{% url 'home' %}">
+      SOLEVAULT<span class="vault-dot"></span>
+    </a>
+
+    <!-- Mobile Quick Actions (Visible only on mobile/tablet screens) -->
+    <div class="d-flex align-items-center gap-2 d-lg-none ms-auto me-2">
+      <!-- Search Trigger -->
+      <button type="button" class="nav-action-btn-sm" data-bs-toggle="modal" data-bs-target="#searchModal" title="Search sneakers">
+        <i class="bi bi-search"></i>
+      </button>
+
+      <!-- Wishlist -->
+      <a href="{% url 'wishlist' %}" class="nav-action-btn-sm position-relative" title="Saved Wishlist">
+        <i class="bi bi-heart"></i>
+        <span class="nav-badge" id="mobileNavbarWishlistCount" style="{% if wishlist_count == 0 %}display:none;{% endif %}">{{ wishlist_count }}</span>
+      </a>
+
+      <!-- Cart Bag -->
+      <a href="{% url 'cart' %}" class="nav-action-btn-sm position-relative" title="Shopping Bag">
+        <i class="bi bi-bag"></i>
+        <span class="nav-badge" id="mobileNavbarCartCount" style="{% if cart_count == 0 %}display:none;{% endif %}">{{ cart_count }}</span>
+      </a>
+    </div>
+
+    <!-- Mobile Toggler -->
+    <button class="navbar-toggler border-0 shadow-none px-2 py-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMainContent" aria-controls="navbarMainContent" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="bi bi-list fs-2 text-dark"></i>
+    </button>
+
+    <!-- Nav Links & Dropdowns -->
+    <div class="collapse navbar-collapse" id="navbarMainContent">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'shop' and not request.GET.sort and not request.GET.category %}active{% endif %}" href="{% url 'shop' %}">Shop All</a>
+        </li>
+        
+        <!-- Categories Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Categories
+          </a>
+          <ul class="dropdown-menu shadow border-0">
+            {% for cat in global_categories %}
+              <li><a class="dropdown-item py-2" href="{% url 'shop' %}?category={{ cat.slug }}">{{ cat.name }}</a></li>
+            {% empty %}
+              <li><a class="dropdown-item py-2" href="{% url 'shop' %}">All Sneakers</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'shop' %}?sort=newest">New Arrivals</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'shop' %}?sort=popular">Best Sellers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact</a>
+        </li>
+      </ul>
+
+      <!-- Desktop Action Icons (Search, Wishlist, Cart, Profile) -->
+      <div class="d-none d-lg-flex align-items-center gap-2">
+        <!-- Search Trigger -->
+        <button type="button" class="nav-action-btn" data-bs-toggle="modal" data-bs-target="#searchModal" title="Search sneakers">
+          <i class="bi bi-search"></i>
+        </button>
+
+        <!-- Wishlist -->
+        <a href="{% url 'wishlist' %}" class="nav-action-btn" title="Saved Wishlist">
+          <i class="bi bi-heart"></i>
+          <span class="nav-badge" id="navbarWishlistCount" style="{% if wishlist_count == 0 %}display:none;{% endif %}">{{ wishlist_count }}</span>
+        </a>
+
+        <!-- Cart Bag -->
+        <a href="{% url 'cart' %}" class="nav-action-btn" title="Shopping Bag">
+          <i class="bi bi-bag"></i>
+          <span class="nav-badge" id="navbarCartCount" style="{% if cart_count == 0 %}display:none;{% endif %}">{{ cart_count }}</span>
+        </a>
+
+        <!-- User Authentication Menu -->
+        <div class="dropdown ms-1">
+          <button class="nav-action-btn dropdown-toggle no-arrow" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Account">
+            <i class="bi bi-person"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+            {% if user.is_authenticated %}
+              <li class="px-3 py-2 border-bottom">
+                <span class="d-block small text-muted">Signed in as</span>
+                <span class="fw-bold text-dark">{{ user.first_name|default:user.username }}</span>
+              </li>
+              <li><a class="dropdown-item mt-1 py-2" href="{% url 'profile' %}"><i class="bi bi-person-gear me-2 text-muted"></i>My Profile</a></li>
+              <li><a class="dropdown-item py-2" href="{% url 'orders' %}"><i class="bi bi-box-seam me-2 text-muted"></i>My Orders</a></li>
+              <li><a class="dropdown-item py-2" href="{% url 'wishlist' %}"><i class="bi bi-heart me-2 text-muted"></i>Wishlist</a></li>
+              {% if user.is_staff %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-primary py-2" href="/admin/" target="_blank"><i class="bi bi-shield-lock me-2"></i>Admin Dashboard</a></li>
+              {% endif %}
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger py-2" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+            {% else %}
+              <li class="px-3 py-2 border-bottom">
+                <span class="small text-muted">Welcome to SoleVault</span>
+              </li>
+              <li><a class="dropdown-item mt-1 py-2" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-2 text-muted"></i>Sign In</a></li>
+              <li><a class="dropdown-item py-2" href="{% url 'register' %}"><i class="bi bi-person-plus me-2 text-muted"></i>Create Account</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Mobile Account Options (Inside collapse for mobile) -->
+      <div class="d-lg-none mt-3 pt-3 border-top">
+        {% if user.is_authenticated %}
+          <div class="px-2 py-2 mb-2 bg-light rounded-3 d-flex align-items-center justify-content-between">
+            <div>
+              <span class="d-block small text-muted">Signed in as</span>
+              <span class="fw-bold text-dark">{{ user.first_name|default:user.username }}</span>
+            </div>
+            <a href="{% url 'profile' %}" class="btn btn-sm btn-outline-dark">Profile</a>
+          </div>
+          <div class="d-grid gap-2">
+            <a href="{% url 'orders' %}" class="btn btn-outline-dark btn-sm text-start"><i class="bi bi-box-seam me-2"></i>My Orders</a>
+            <a href="{% url 'wishlist' %}" class="btn btn-outline-dark btn-sm text-start"><i class="bi bi-heart me-2"></i>My Wishlist ({{ wishlist_count }})</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm text-start"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a>
+          </div>
+        {% else %}
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="{% url 'login' %}" class="btn btn-outline-dark w-100 btn-sm"><i class="bi bi-box-arrow-in-right me-1"></i>Sign In</a>
+            </div>
+            <div class="col-6">
+              <a href="{% url 'register' %}" class="btn btn-dark w-100 btn-sm"><i class="bi bi-person-plus me-1"></i>Register</a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>

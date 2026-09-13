@@ -1,0 +1,71 @@
+<footer class="vault-footer">
+  <div class="container">
+    <div class="row g-4 mb-5">
+      <!-- Brand Col -->
+      <div class="col-lg-4 col-md-6">
+        <h3 class="navbar-brand-text text-white mb-3">
+          SOLEVAULT<span class="vault-dot"></span>
+        </h3>
+        <p class="text-white-50 mb-4" style="max-width: 320px;">
+          India's premier luxury sneaker vault. Curating 100% verified authenticated grails, high-performance athletic innovations, and exclusive streetwear drops across Mumbai, Delhi, Bengaluru, and beyond.
+        </p>
+        
+        <!-- Social Media Channels -->
+        <div class="d-flex flex-wrap gap-2">
+          <a href="https://instagram.com" target="_blank" class="social-icon-btn" title="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="https://wa.me/919820012345" target="_blank" class="social-icon-btn" title="WhatsApp Concierge"><i class="bi bi-whatsapp"></i></a>
+          <a href="https://twitter.com" target="_blank" class="social-icon-btn" title="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+          <a href="https://youtube.com" target="_blank" class="social-icon-btn" title="YouTube"><i class="bi bi-youtube"></i></a>
+          <a href="https://facebook.com" target="_blank" class="social-icon-btn" title="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="https://linkedin.com" target="_blank" class="social-icon-btn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6 class="footer-heading">Collections</h6>
+        <ul class="footer-links">
+          <li><a href="{% url 'shop' %}">All Sneakers</a></li>
+          <li><a href="{% url 'shop' %}?sort=newest">New Arrivals</a></li>
+          <li><a href="{% url 'shop' %}?sort=popular">Best Sellers</a></li>
+          <li><a href="{% url 'shop' %}?category=limited-edition">Limited Edition</a></li>
+          <li><a href="{% url 'shop' %}?category=running">Running</a></li>
+          <li><a href="{% url 'shop' %}?category=lifestyle">Lifestyle</a></li>
+        </ul>
+      </div>
+
+      <!-- Customer Care -->
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6 class="footer-heading">Customer Care</h6>
+        <ul class="footer-links">
+          <li><a href="{% url 'faq' %}">Indian Sizing & FAQ</a></li>
+          <li><a href="{% url 'orders' %}">Track Courier Delivery</a></li>
+          <li><a href="{% url 'contact' %}">Contact Concierge</a></li>
+          <li><a href="{% url 'about' %}">Authentication Heritage</a></li>
+          <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
+          <li><a href="{% url 'terms' %}">Terms & Conditions</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter Col -->
+      <div class="col-lg-4 col-md-6">
+        <h6 class="footer-heading">Join The VIP Vault Drop List</h6>
+        <p class="text-white-50 small mb-3">
+          Receive confidential early release dates in India, member-exclusive secret coupon codes, and private vault drop invitations.
+        </p>
+        <form action="{% url 'newsletter_subscribe' %}" method="POST" class="mb-3">
+          {% csrf_token %}
+          <div class="input-group">
+            <input type="email" name="email" class="form-control bg-dark text-white border-secondary" placeholder="Enter your email" required>
+            <button class="btn btn-vault-gold" type="submit">Subscribe</button>
+          </div>
+        </form>
+        <div class="d-flex align-items-center gap-2 text-white-50 small">
+          <i class="bi bi-shield-lock-fill text-warning"></i>
+          <span>100% spam-free. Instant unsubscribe anytime.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</footer>

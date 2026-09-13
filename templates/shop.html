@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shop All Sneakers India — SoleVault | Premium Sneaker Collection{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs & Header -->
+<div class="py-3 py-md-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Shop</li>
+        {% if selected_category %}
+          <li class="breadcrumb-item active" aria-current="page">{{ selected_category.name }}</li>
+        {% elif selected_brand %}
+          <li class="breadcrumb-item active" aria-current="page">{{ selected_brand.name }}</li>
+        {% endif %}
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <h1 class="font-heading fw-bold mb-0 fs-3 fs-md-2">
+          {% if search_query %}
+            Search Results for "{{ search_query }}"
+          {% elif selected_category %}
+            {{ selected_category.name }} Collection
+          {% elif selected_brand %}
+            {{ selected_brand.name }} Sneakers
+          {% else %}
+            ALL SNEAKERS // INDIA VAULT
+          {% endif %}
+        </h1>
+        <p class="text-muted small mb-0 mt-1">Showing {{ products.start_index|default:0 }}–{{ products.end_index|default:0 }} of {{ total_count }} authenticated sneakers with pan-India dispatch</p>
+      </div>
+
+      <!-- Sorting & Mobile Filter Trigger Controls -->
+      <div class="d-flex align-items-center gap-2 w-100 w-sm-auto justify-content-between justify-content-sm-end">
+        <!-- Mobile Filter Button Trigger -->
+        <button class="btn btn-outline-dark btn-sm d-lg-none d-flex align-items-center gap-2 px-3 py-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" aria-controls="filterOffcanvas">
+          <i class="bi bi-sliders"></i>
+          <span>Filter</span>
+          {% if selected_category or selected_brand or selected_size or min_price or max_price %}
+            <span class="badge bg-dark rounded-pill">Active</span>
+          {% endif %}
+        </button>
+
+        <!-- Sorting Form -->
+        <form method="GET" class="d-flex align-items-center gap-2">
+          {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+          {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+          {% if selected_brand %}<input type="hidden" name="brand" value="{{ selected_brand.slug }}">{% endif %}
+          {% if selected_size %}<input type="hidden" name="size" value="{{ selected_size }}">{% endif %}
+          {% if min_price %}<input type="hidden" name="min_price" value="{{ min_price }}">{% endif %}
+          {% if max_price %}<input type="hidden" name="max_price" value="{{ max_price }}">{% endif %}
+          
+          <label for="sortSelect" class="small text-muted fw-semibold text-nowrap d-none d-md-inline">Sort by:</label>
+          <select name="sort" id="sortSelect" class="form-select form-select-sm" style="min-width: 140px;" onchange="this.form.submit()">
+            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest Drops</option>
+            <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Most Popular</option>
+            <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="discount" {% if current_sort == 'discount' %}selected{% endif %}>On Sale</option>
+          </select>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row g-4">
+    <!-- Desktop Filters Sidebar (Visible >= lg) -->
+    <div class="col-lg-3 d-none d-lg-block">
+      <div class="filter-sidebar">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="font-heading fw-bold mb-0"><i class="bi bi-sliders me-1"></i> FILTERS</h5>
+          {% if search_query or selected_category or selected_brand or selected_size or min_price or max_price or current_sort != 'newest' %}
+            <a href="{% url 'shop' %}" class="btn btn-sm btn-link text-danger p-0 text-decoration-none small">
+              <i class="bi bi-x-circle me-1"></i> Clear All
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Filter Form -->
+        <form method="GET" action="{% url 'shop' %}">
+          {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+          
+          <!-- Search in shop -->
+          <div class="mb-4">
+            <div class="input-group input-group-sm">
+              <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search sneakers...">
+              <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+          </div>
+
+          <!-- Price Brackets (₹500 to ₹15,000+) -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="filter-heading mb-0 border-0 p-0">Price (₹ INR)</h6>
+              {% if min_price or max_price %}
+                <a href="{% url 'shop' %}?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}{% if selected_brand %}brand={{ selected_brand.slug }}&{% endif %}{% if selected_size %}size={{ selected_size }}&{% endif %}{% if current_sort %}sort={{ current_sort }}{% endif %}" class="small text-danger text-decoration-none" style="font-size: 0.75rem;">Reset</a>
+              {% endif %}
+            </div>
+            
+            <!-- Quick Price Bracket Pills -->
+            <div class="d-flex flex-column gap-1 mb-3">
+              {% for bracket in price_brackets %}
+                <a href="{% url 'shop' %}?min_price={{ bracket.min }}{% if bracket.max %}&max_price={{ bracket.max }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}{% if selected_size %}&size={{ selected_size }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                   class="filter-list-item {% if min_price == bracket.min and max_price == bracket.max %}active text-dark fw-bold bg-light rounded px-2{% endif %}">
+                  <span>{{ bracket.label }}</span>
+                  <i class="bi bi-chevron-right small text-muted"></i>
+                </a>
+              {% endfor %}
+            </div>
+
+            <!-- Custom Min/Max Inputs -->
+            <div class="p-2 bg-light rounded-3 border">
+              <span class="d-block small text-muted fw-semibold mb-2" style="font-size: 0.75rem;">CUSTOM RANGE (₹)</span>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Min ₹" value="{{ min_price|default:'' }}" min="500" step="500">
+                </div>
+                <div class="col-6">
+                  <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Max ₹" value="{{ max_price|default:'' }}" min="500" step="500">
+                </div>
+              </div>
+              {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+              {% if selected_brand %}<input type="hidden" name="brand" value="{{ selected_brand.slug }}">{% endif %}
+              {% if selected_size %}<input type="hidden" name="size" value="{{ selected_size }}">{% endif %}
+              <button type="submit" class="btn btn-dark btn-sm w-100 py-1" style="font-size: 0.8rem;">Apply Custom Price</button>
+            </div>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="mb-4">
+            <h6 class="filter-heading">Categories</h6>
+            <div class="d-flex flex-column gap-1">
+              <a href="{% url 'shop' %}{% if query_string %}?{{ query_string }}{% endif %}" class="filter-list-item {% if not selected_category %}active text-dark fw-bold{% endif %}">
+                <span>All Categories</span>
+                <span class="filter-count-badge">{{ total_count }}</span>
+              </a>
+              {% for cat in all_categories %}
+                <a href="{% url 'shop' %}?category={{ cat.slug }}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}{% if selected_size %}&size={{ selected_size }}{% endif %}{% if current_sort != 'newest' %}&sort={{ current_sort }}{% endif %}" class="filter-list-item {% if selected_category.slug == cat.slug %}active text-dark fw-bold{% endif %}">
+                  <span>{{ cat.name }}</span>
+                  <span class="filter-count-badge">{{ cat.prod_count }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Brand Filter -->
+          <div class="mb-4">
+            <h6 class="filter-heading">Brands</h6>
+            <div class="d-flex flex-column gap-1">
+              {% for b in all_brands %}
+                <a href="{% url 'shop' %}?brand={{ b.slug }}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if selected_size %}&size={{ selected_size }}{% endif %}{% if current_sort != 'newest' %}&sort={{ current_sort }}{% endif %}" class="filter-list-item {% if selected_brand.slug == b.slug %}active text-dark fw-bold{% endif %}">
+                  <span>{{ b.name }}</span>
+                  <span class="filter-count-badge">{{ b.prod_count }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Indian / UK Size Filter -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="filter-heading mb-0 border-0 p-0">UK / India Size</h6>
+              <a href="{% url 'faq' %}" class="small text-muted text-decoration-underline" style="font-size: 0.75rem;">Size Chart</a>
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+              {% for s in all_sizes %}
+                <a href="{% url 'shop' %}?size={{ s }}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}" class="btn btn-sm {% if selected_size == s %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} py-1 px-2" style="font-size: 0.78rem;">
+                  {{ s }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Product Grid & Pagination -->
+    <div class="col-lg-9">
+      {% if products %}
+        <div class="row g-3 g-md-4 row-cols-2 row-cols-md-3 row-cols-lg-3">
+          {% for product in products %}
+            <div class="col">
+              <div class="product-card h-100 d-flex flex-column">
+                <!-- Badges -->
+                <div class="product-badges">
+                  {% if product.has_discount %}
+                    <span class="badge-tag badge-tag-sale">{{ product.discount_percent }}% OFF</span>
+                  {% elif product.is_new %}
+                    <span class="badge-tag badge-tag-new">NEW</span>
+                  {% endif %}
+                  {% if product.category.slug == 'limited-edition' %}
+                    <span class="badge-tag badge-tag-limited d-none d-sm-inline-block">GRAIL</span>
+                  {% endif %}
+                </div>
+
+                <!-- Wishlist Toggle Button -->
+                {% if user.is_authenticated %}
+                  <button type="button" class="wishlist-btn-corner wishlist-ajax-btn" data-product-id="{{ product.id }}" title="Save to Wishlist">
+                    <i class="bi bi-heart"></i>
+                  </button>
+                {% else %}
+                  <a href="{% url 'login' %}?next={{ request.path }}" class="wishlist-btn-corner" title="Login to save">
+                    <i class="bi bi-heart"></i>
+                  </a>
+                {% endif %}
+
+                <!-- Product Image -->
+                <a href="{% url 'product_detail' slug=product.slug %}" class="product-card-img-wrap">
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                </a>
+
+                <!-- Product Info -->
+                <div class="product-card-body d-flex flex-column flex-grow-1">
+                  <span class="product-brand">{{ product.brand.name }}</span>
+                  <a href="{% url 'product_detail' slug=product.slug %}" class="product-title" title="{{ product.name }}">{{ product.name }}</a>
+                  
+                  <div class="d-flex align-items-center gap-1 mb-2 small text-warning">
+                    <i class="bi bi-star-fill" style="font-size: 0.75rem;"></i>
+                    <span class="text-dark fw-bold ms-1" style="font-size: 0.8rem;">{{ product.average_rating }}</span>
+                    <span class="text-muted d-none d-sm-inline" style="font-size: 0.75rem;">({{ product.total_reviews }})</span>
+                  </div>
+
+                  <div class="product-price-box mt-auto">
+                    <span class="product-price">₹{{ product.current_price|floatformat:0 }}</span>
+                    {% if product.has_discount %}
+                      <span class="product-price-old">₹{{ product.price|floatformat:0 }}</span>
+                    {% endif %}
+                  </div>
+
+                  <div class="product-card-actions mt-2">
+                    <a href="{% url 'product_detail' slug=product.slug %}" class="btn btn-vault btn-vault-sm w-100 py-1 py-sm-2 text-nowrap">
+                      <i class="bi bi-bag-plus me-1"></i> <span class="d-none d-sm-inline">Select</span> Size
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if products.has_other_pages %}
+          <div class="d-flex justify-content-center mt-5">
+            <nav aria-label="Page navigation">
+              <ul class="pagination pagination-md flex-wrap justify-content-center">
+                {% if products.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link text-dark" href="?page={{ products.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">
+                      <i class="bi bi-chevron-left"></i> <span class="d-none d-sm-inline">Prev</span>
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+                {% endif %}
+
+                {% for num in products.paginator.page_range %}
+                  {% if products.number == num %}
+                    <li class="page-item active"><span class="page-link bg-dark border-dark text-white">{{ num }}</span></li>
+                  {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                    <li class="page-item"><a class="page-link text-dark" href="?page={{ num }}{% if query_string %}&{{ query_string }}{% endif %}">{{ num }}</a></li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                  <li class="page-item">
+                    <a class="page-link text-dark" href="?page={{ products.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">
+                      <span class="d-none d-sm-inline">Next</span> <i class="bi bi-chevron-right"></i>
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        {% endif %}
+
+      {% else %}
+        <!-- Empty State -->
+        <div class="card border-0 bg-white shadow-sm p-4 p-md-5 text-center rounded-4">
+          <div class="mb-3 text-muted">
+            <i class="bi bi-search fs-1"></i>
+          </div>
+          <h4 class="font-heading fw-bold mb-2">No sneakers matched your criteria</h4>
+          <p class="text-muted mb-4">Try adjusting your price range or filter choices to explore authentic pairs in the vault.</p>
+          <div>
+            <a href="{% url 'shop' %}" class="btn btn-vault">Reset All Filters</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Offcanvas Filter Drawer -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel">
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title font-heading fw-bold" id="filterOffcanvasLabel">
+      <i class="bi bi-sliders me-2"></i> Filters & Pricing
+    </h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <span class="small text-muted">Filter sneaker catalog</span>
+      {% if search_query or selected_category or selected_brand or selected_size or min_price or max_price %}
+        <a href="{% url 'shop' %}" class="btn btn-sm btn-link text-danger p-0 text-decoration-none small">
+          <i class="bi bi-x-circle me-1"></i> Clear All
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Mobile Price Brackets -->
+    <div class="mb-4">
+      <h6 class="filter-heading">Price Range (₹ INR)</h6>
+      <div class="d-flex flex-column gap-1 mb-3">
+        {% for bracket in price_brackets %}
+          <a href="{% url 'shop' %}?min_price={{ bracket.min }}{% if bracket.max %}&max_price={{ bracket.max }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}{% if selected_size %}&size={{ selected_size }}{% endif %}"
+             class="filter-list-item {% if min_price == bracket.min and max_price == bracket.max %}active text-dark fw-bold bg-light rounded px-2{% endif %}">
+            <span>{{ bracket.label }}</span>
+            <i class="bi bi-chevron-right small text-muted"></i>
+          </a>
+        {% endfor %}
+      </div>
+
+      <!-- Custom Min/Max -->
+      <form method="GET" action="{% url 'shop' %}">
+        {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+        {% if selected_brand %}<input type="hidden" name="brand" value="{{ selected_brand.slug }}">{% endif %}
+        {% if selected_size %}<input type="hidden" name="size" value="{{ selected_size }}">{% endif %}
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Min ₹" value="{{ min_price|default:'' }}" min="500" step="500">
+          </div>
+          <div class="col-6">
+            <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Max ₹" value="{{ max_price|default:'' }}" min="500" step="500">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-dark btn-sm w-100 py-2">Apply Custom Range</button>
+      </form>
+    </div>
+
+    <!-- Mobile Categories -->
+    <div class="mb-4">
+      <h6 class="filter-heading">Categories</h6>
+      <div class="d-flex flex-column gap-1">
+        <a href="{% url 'shop' %}" class="filter-list-item {% if not selected_category %}active text-dark fw-bold{% endif %}">
+          <span>All Categories</span>
+        </a>
+        {% for cat in all_categories %}
+          <a href="{% url 'shop' %}?category={{ cat.slug }}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}" class="filter-list-item {% if selected_category.slug == cat.slug %}active text-dark fw-bold{% endif %}">
+            <span>{{ cat.name }}</span>
+            <span class="filter-count-badge">{{ cat.prod_count }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Mobile Brands -->
+    <div class="mb-4">
+      <h6 class="filter-heading">Brands</h6>
+      <div class="d-flex flex-column gap-1">
+        {% for b in all_brands %}
+          <a href="{% url 'shop' %}?brand={{ b.slug }}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}" class="filter-list-item {% if selected_brand.slug == b.slug %}active text-dark fw-bold{% endif %}">
+            <span>{{ b.name }}</span>
+            <span class="filter-count-badge">{{ b.prod_count }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Mobile UK Sizes -->
+    <div class="mb-4">
+      <h6 class="filter-heading">UK / India Size</h6>
+      <div class="d-flex flex-wrap gap-1">
+        {% for s in all_sizes %}
+          <a href="{% url 'shop' %}?size={{ s }}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if selected_brand %}&brand={{ selected_brand.slug }}{% endif %}" class="btn btn-sm {% if selected_size == s %}btn-dark text-white{% else %}btn-outline-secondary{% endif %} py-1 px-2" style="font-size: 0.8rem;">
+            {{ s }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

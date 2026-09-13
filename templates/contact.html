@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Concierge — SoleVault India Customer Care{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Contact</li>
+      </ol>
+    </nav>
+    <h1 class="font-heading fw-bold mb-0">CONTACT CONCIERGE // INDIA</h1>
+    <p class="text-muted small mb-0">Our sneaker specialists and private advisors in Mumbai & Delhi are at your service.</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row g-5">
+    <!-- Contact Form Col -->
+    <div class="col-lg-7">
+      <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5">
+        <h4 class="font-heading fw-bold mb-3">Send Us a Message</h4>
+        <p class="text-muted small mb-4">Have an inquiry regarding a specific sneaker drop, UK sizing consultation, or custom corporate order in India? Fill out the form below.</p>
+
+        <form method="POST" action="{% url 'contact' %}">
+          {% csrf_token %}
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label font-heading fw-bold small">Your Name *</label>
+              {{ form.name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label font-heading fw-bold small">Email Address *</label>
+              {{ form.email }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label font-heading fw-bold small">Subject *</label>
+            {{ form.subject }}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label font-heading fw-bold small">Message *</label>
+            {{ form.message }}
+          </div>
+
+          <button type="submit" class="btn btn-vault btn-vault-lg">
+            <i class="bi bi-send-fill me-1"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Contact Information & Flagship Boutique Col -->
+    <div class="col-lg-5">
+      <div class="d-flex flex-column gap-4">
+        <!-- Direct Channels -->
+        <div class="card border-0 bg-white shadow-sm rounded-4 p-4">
+          <h5 class="font-heading fw-bold mb-3 pb-2 border-bottom">Direct Channels</h5>
+          
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="benefit-icon-wrap" style="width: 44px; height: 44px; font-size: 1.2rem; flex-shrink: 0; background: #25D366; color: #fff;">
+              <i class="bi bi-whatsapp"></i>
+            </div>
+            <div>
+              <span class="small text-muted d-block fw-bold text-uppercase">WhatsApp VIP Helpline</span>
+              <a href="https://wa.me/919820012345" target="_blank" class="fw-bold text-dark">+91 98200 12345</a>
+              <span class="d-block small text-muted">Instant response for sizing & orders</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="benefit-icon-wrap" style="width: 44px; height: 44px; font-size: 1.2rem; flex-shrink: 0;">
+              <i class="bi bi-envelope"></i>
+            </div>
+            <div>
+              <span class="small text-muted d-block fw-bold text-uppercase">Email Concierge</span>
+              <a href="mailto:concierge@solevault.in" class="fw-bold text-dark">concierge@solevault.in</a>
+              <span class="d-block small text-muted">Response within 24 hours</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="benefit-icon-wrap" style="width: 44px; height: 44px; font-size: 1.2rem; flex-shrink: 0;">
+              <i class="bi bi-telephone"></i>
+            </div>
+            <div>
+              <span class="small text-muted d-block fw-bold text-uppercase">Toll Free Phone</span>
+              <a href="tel:+9118002008899" class="fw-bold text-dark">1800-200-8899</a>
+              <span class="d-block small text-muted">Mon–Sat: 10:00 AM – 8:00 PM IST</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3">
+            <div class="benefit-icon-wrap" style="width: 44px; height: 44px; font-size: 1.2rem; flex-shrink: 0;">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+            <div>
+              <span class="small text-muted d-block fw-bold text-uppercase">Mumbai Flagship Boutique</span>
+              <address class="text-dark small mb-0 fw-semibold">
+                Bandra Kurla Complex (BKC), G Block<br>
+                Mumbai, Maharashtra 400051, India
+              </address>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ quick link card -->
+        <div class="card border-0 bg-dark text-white rounded-4 p-4">
+          <h5 class="font-heading fw-bold mb-2">Need Sizing Guide?</h5>
+          <p class="text-white-50 small mb-3">Check our complete Indian/UK sneaker size chart with centimetre (CM) foot measurements.</p>
+          <div>
+            <a href="{% url 'faq' %}" class="btn btn-vault-gold btn-vault-sm">View Sizing Guide</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions (FAQ) & Sizing Guide — SoleVault India{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">FAQ & Sizing</li>
+      </ol>
+    </nav>
+    <h1 class="font-heading fw-bold mb-0">FREQUENTLY ASKED QUESTIONS & SIZE GUIDE</h1>
+    <p class="text-muted small mb-0">Complete guidance on Indian & UK sizing in centimeters (CM), pan-India courier delivery, and authentication.</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      
+      <!-- Sizing Section & Indian/UK Chart with CM measurements -->
+      <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="benefit-icon-wrap" style="width: 44px; height: 44px; font-size: 1.2rem; margin-bottom: 0;">
+            <i class="bi bi-rulers"></i>
+          </div>
+          <h3 class="font-heading fw-bold mb-0">Indian / UK Sneaker Size Chart (Foot Length in CM)</h3>
+        </div>
+        <p class="text-muted small mb-4">
+          In India, footwear standard sizes align with <strong>UK sizing</strong>. Below is the official conversion matrix mapping Indian/UK sizes against US, EU, and exact foot measurements in <strong>centimeters (CM)</strong>.
+        </p>
+
+        <!-- Sizing Table -->
+        <div class="table-responsive mb-4">
+          <table class="table table-hover table-bordered text-center align-middle small">
+            <thead class="table-dark">
+              <tr>
+                <th class="py-3">UK / India Size</th>
+                <th class="py-3">US Men's</th>
+                <th class="py-3">EU Size</th>
+                <th class="py-3 text-warning">Foot Length (CM)</th>
+                <th class="py-3">Popular Fit Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>UK 6</strong></td>
+                <td>US 7</td>
+                <td>EU 40</td>
+                <td class="fw-bold bg-light">25.0 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr>
+                <td><strong>UK 6.5</strong></td>
+                <td>US 7.5</td>
+                <td>EU 40.5</td>
+                <td class="fw-bold bg-light">25.5 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr>
+                <td><strong>UK 7</strong></td>
+                <td>US 8</td>
+                <td>EU 41</td>
+                <td class="fw-bold bg-light">26.0 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr>
+                <td><strong>UK 7.5</strong></td>
+                <td>US 8.5</td>
+                <td>EU 42</td>
+                <td class="fw-bold bg-light">26.5 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr class="table-warning">
+                <td><strong>UK 8 (Best Seller)</strong></td>
+                <td>US 9</td>
+                <td>EU 42.5</td>
+                <td class="fw-bold">27.0 cm</td>
+                <td>Standard Indian Fit</td>
+              </tr>
+              <tr>
+                <td><strong>UK 8.5</strong></td>
+                <td>US 9.5</td>
+                <td>EU 43</td>
+                <td class="fw-bold bg-light">27.5 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr class="table-warning">
+                <td><strong>UK 9 (Best Seller)</strong></td>
+                <td>US 10</td>
+                <td>EU 44</td>
+                <td class="fw-bold">28.0 cm</td>
+                <td>Standard Indian Fit</td>
+              </tr>
+              <tr>
+                <td><strong>UK 9.5</strong></td>
+                <td>US 10.5</td>
+                <td>EU 44.5</td>
+                <td class="fw-bold bg-light">28.5 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr>
+                <td><strong>UK 10</strong></td>
+                <td>US 11</td>
+                <td>EU 45</td>
+                <td class="fw-bold bg-light">29.0 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr>
+                <td><strong>UK 10.5</strong></td>
+                <td>US 11.5</td>
+                <td>EU 45.5</td>
+                <td class="fw-bold bg-light">29.5 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr>
+                <td><strong>UK 11</strong></td>
+                <td>US 12</td>
+                <td>EU 46</td>
+                <td class="fw-bold bg-light">30.0 cm</td>
+                <td>True to Size</td>
+              </tr>
+              <tr>
+                <td><strong>UK 12</strong></td>
+                <td>US 13</td>
+                <td>EU 47.5</td>
+                <td class="fw-bold bg-light">31.0 cm</td>
+                <td>True to Size</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- How to Measure in CM -->
+        <div class="bg-light p-4 rounded-3 border">
+          <h5 class="font-heading fw-bold mb-3"><i class="bi bi-pencil-square text-primary me-2"></i>How to Measure Your Foot Length in Centimeters (CM)</h5>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="p-3 bg-white rounded-3 h-100 shadow-sm">
+                <span class="badge bg-dark mb-2">Step 1</span>
+                <p class="small text-muted mb-0">Place a blank sheet of paper flat on the floor firmly against a wall.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 bg-white rounded-3 h-100 shadow-sm">
+                <span class="badge bg-dark mb-2">Step 2</span>
+                <p class="small text-muted mb-0">Stand on the paper with your heel lightly pressing against the wall.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 bg-white rounded-3 h-100 shadow-sm">
+                <span class="badge bg-dark mb-2">Step 3</span>
+                <p class="small text-muted mb-0">Mark your longest toe and measure with a ruler in CM to find your exact UK size.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Accordions -->
+      <div class="mb-4">
+        <h4 class="font-heading fw-bold mb-3"><i class="bi bi-shield-check text-warning me-2"></i> 1. Authenticity Guarantee</h4>
+        <div class="accordion accordion-flush bg-white rounded-3 shadow-sm border overflow-hidden" id="faqAuth">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button font-heading fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#auth1">
+                How does SoleVault verify sneakers in India?
+              </button>
+            </h2>
+            <div id="auth1" class="accordion-collapse collapse show" data-bs-parent="#faqAuth">
+              <div class="accordion-body small text-muted">
+                Every sneaker sold on SoleVault passes through our physical verification lab. Master authenticators evaluate over 40 distinct security markers including UV phosphorescence, stitch tensions, manufacturing font geometry, and RFID microchips before attaching our tamper-evident QR security seal.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="font-heading fw-bold mb-3"><i class="bi bi-truck text-success me-2"></i> 2. Shipping & Pan-India Delivery</h4>
+        <div class="accordion accordion-flush bg-white rounded-3 shadow-sm border overflow-hidden" id="faqShip">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button font-heading fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#ship1">
+                What are the delivery timelines across Indian cities?
+              </button>
+            </h2>
+            <div id="ship1" class="accordion-collapse collapse show" data-bs-parent="#faqShip">
+              <div class="accordion-body small text-muted">
+                Metro cities (Mumbai, Delhi NCR, Bengaluru, Hyderabad, Chennai, Kolkata, Pune) receive delivery within 24–48 hours via Delhivery Air or BlueDart Apex. Tier 2 and Tier 3 cities receive delivery within 3–4 business days. Free shipping applies on all orders above ₹4,999.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="font-heading fw-bold mb-3"><i class="bi bi-credit-card text-primary me-2"></i> 3. Payment Methods & UPI</h4>
+        <div class="accordion accordion-flush bg-white rounded-3 shadow-sm border overflow-hidden" id="faqPay">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button font-heading fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#pay1">
+                Which Indian payment options are accepted?
+              </button>
+            </h2>
+            <div id="pay1" class="accordion-collapse collapse show" data-bs-parent="#faqPay">
+              <div class="accordion-body small text-muted">
+                We accept all major Indian payment channels: UPI (Google Pay, PhonePe, Paytm, BHIM), RuPay, Visa, Mastercard, Net Banking across 50+ Indian banks, and Cash on Delivery (COD).
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Need more help box -->
+      <div class="bg-dark text-white p-4 rounded-4 text-center mt-5">
+        <h5 class="font-heading fw-bold mb-2">Need Direct Assistance with Sizing?</h5>
+        <p class="text-white-50 small mb-3">Chat with our Mumbai concierge specialists via WhatsApp or Phone.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="https://wa.me/919820012345" target="_blank" class="btn btn-success btn-vault-sm">
+            <i class="bi bi-whatsapp me-1"></i> WhatsApp Sizing Expert
+          </a>
+          <a href="{% url 'contact' %}" class="btn btn-vault-gold btn-vault-sm">
+            Contact Concierge
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,506 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — SoleVault India Luxury Sneakers{% endblock %}
+{% block meta_description %}{{ product.description|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="py-3 bg-white border-bottom">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'shop' %}">Shop</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'shop' %}?category={{ product.category.slug }}">{{ product.category.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5">
+    <!-- Image Gallery Col -->
+    <div class="col-lg-6">
+      <div class="sticky-top" style="top: 100px; z-index: 10;">
+        <div class="gallery-main-img-wrap mb-3">
+          <img id="mainProductImage" src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
+          
+          <!-- Badges -->
+          <div class="product-badges">
+            {% if product.has_discount %}
+              <span class="badge-tag badge-tag-sale">{{ product.discount_percent }}% OFF</span>
+            {% elif product.is_new %}
+              <span class="badge-tag badge-tag-new">NEW DROP</span>
+            {% endif %}
+            {% if product.category.slug == 'limited-edition' %}
+              <span class="badge-tag badge-tag-limited">VAULT GRAIL</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Thumbnails -->
+        <div class="d-flex gap-3 overflow-auto pb-2">
+          <div class="gallery-thumb active" data-img-src="{{ product.image.url }}">
+            <img src="{{ product.image.url }}" alt="Main angle">
+          </div>
+          {% for g_img in product.gallery_images.all %}
+            <div class="gallery-thumb" data-img-src="{{ g_img.image.url }}">
+              <img src="{{ g_img.image.url }}" alt="{{ g_img.caption|default:'Angle view' }}">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Details & Purchase Form Col -->
+    <div class="col-lg-6">
+      <div class="ps-lg-3">
+        <!-- Brand & Title -->
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="text-uppercase fw-bold letter-spacing-2 small text-muted">{{ product.brand.name }}</span>
+          {% if user.is_authenticated %}
+            <button type="button" class="btn btn-sm btn-outline-dark wishlist-ajax-btn {% if is_in_wishlist %}active text-danger{% endif %}" data-product-id="{{ product.id }}">
+              <i class="bi {% if is_in_wishlist %}bi-heart-fill{% else %}bi-heart{% endif %} me-1"></i>
+              <span>{% if is_in_wishlist %}Wishlisted{% else %}Save{% endif %}</span>
+            </button>
+          {% endif %}
+        </div>
+
+        <h1 class="font-heading fw-bold mb-3">{{ product.name }}</h1>
+
+        <!-- Rating & Stock summary -->
+        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+          <div class="d-flex align-items-center gap-1 text-warning">
+            <i class="bi bi-star-fill"></i>
+            <span class="text-dark fw-bold ms-1">{{ product.average_rating }}</span>
+          </div>
+          <span class="text-muted">|</span>
+          <a href="#reviewsSection" class="text-muted small text-decoration-underline">{{ product.total_reviews }} Verified Reviews</a>
+          <span class="text-muted">|</span>
+          <span class="small {% if product.in_stock %}text-success{% else %}text-danger{% endif %} fw-semibold">
+            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>
+            {% if product.in_stock %}In Stock in India ({{ product.stock }} pairs left){% else %}Sold Out{% endif %}
+          </span>
+        </div>
+
+        <!-- Price Box (₹ INR) -->
+        <div class="d-flex align-items-baseline gap-3 mb-4">
+          <span class="font-heading display-6 fw-bold text-dark">₹{{ product.current_price|floatformat:0 }}</span>
+          {% if product.has_discount %}
+            <del class="text-muted fs-4">₹{{ product.price|floatformat:0 }}</del>
+            <span class="badge bg-danger text-white px-2 py-1 small">SAVE ₹{{ product.price|add:"-product.current_price"|floatformat:0 }}</span>
+          {% endif %}
+          <span class="small text-muted">(Inclusive of all taxes)</span>
+        </div>
+
+        <!-- Colorway -->
+        <div class="mb-4">
+          <span class="small text-muted text-uppercase fw-bold d-block mb-1">Colorway:</span>
+          <span class="fw-semibold text-dark">{{ product.colors }}</span>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <p class="text-muted leading-relaxed">{{ product.description }}</p>
+        </div>
+
+        <!-- Purchase Form (Size & Quantity) -->
+        <form action="{% url 'add_to_cart' product.id %}" method="POST" id="addToCartForm" class="mb-4">
+          {% csrf_token %}
+
+          <!-- Size Selector Header with Size Chart Modal Trigger -->
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="font-heading fw-bold text-uppercase small">
+              Select Size (UK / India): <span id="selectedSizeText" class="text-primary ms-1">None selected</span>
+            </label>
+            <button type="button" class="btn btn-sm btn-link text-dark fw-bold text-decoration-underline p-0" data-bs-toggle="modal" data-bs-target="#sizeChartModal">
+              <i class="bi bi-rulers me-1"></i> Indian/UK Size Guide (CM)
+            </button>
+          </div>
+
+          <!-- Alert if size omitted -->
+          <div id="sizeErrorAlert" class="alert alert-danger py-2 small d-none mb-3">
+            <i class="bi bi-exclamation-circle-fill me-1"></i> Please choose your shoe size (UK/India) before adding to bag.
+          </div>
+
+          <!-- Size Pills Grid -->
+          <div class="size-pill-grid mb-4">
+            {% for s in product.sizes.all %}
+              <div class="size-pill-option">
+                <input type="radio" name="size" id="size_{{ s.id }}" value="{{ s.size }}" {% if s.stock == 0 %}disabled{% endif %}>
+                <label for="size_{{ s.id }}" class="size-pill-label {% if s.stock == 0 %}text-muted bg-light text-decoration-line-through{% endif %}">
+                  {{ s.size }}
+                </label>
+              </div>
+            {% empty %}
+              <div class="col-12 text-muted small">Standard Indian/UK sizing available.</div>
+            {% endfor %}
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="mb-4">
+            <label class="font-heading fw-bold text-uppercase small d-block mb-2">Quantity:</label>
+            <div class="quantity-control-box">
+              <button type="button" class="qty-btn" id="qtyMinus">-</button>
+              <input type="number" name="quantity" id="productQuantity" value="1" min="1" max="10" class="qty-input" readonly>
+              <button type="button" class="qty-btn" id="qtyPlus">+</button>
+            </div>
+          </div>
+
+          <!-- CTA Buttons (Add to Bag & Buy Now) -->
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <button type="submit" name="action" value="add" class="btn btn-vault btn-vault-lg w-100">
+                <i class="bi bi-bag-plus-fill"></i> Add to Bag
+              </button>
+            </div>
+            <div class="col-sm-6">
+              <button type="submit" name="action" value="buy_now" class="btn btn-vault-gold btn-vault-lg w-100">
+                <i class="bi bi-lightning-fill"></i> Buy Now (Instant Checkout)
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Social Media Share Section -->
+        <div class="d-flex align-items-center gap-3 py-3 border-top border-bottom mb-4">
+          <span class="small font-heading fw-bold text-uppercase text-muted">Share This Grail:</span>
+          <div class="d-flex gap-2">
+            <a href="https://api.whatsapp.com/send?text=Check%20out%20{{ product.name }}%20on%20SoleVault%20India" target="_blank" class="social-icon-btn" title="Share on WhatsApp" style="background: #25D366; color: #fff;">
+              <i class="bi bi-whatsapp"></i>
+            </a>
+            <a href="https://twitter.com/intent/tweet?text=Loving%20the%20{{ product.name }}%20on%20SoleVault" target="_blank" class="social-icon-btn" title="Share on X / Twitter">
+              <i class="bi bi-twitter-x"></i>
+            </a>
+            <a href="https://facebook.com/sharer/sharer.php" target="_blank" class="social-icon-btn" title="Share on Facebook">
+              <i class="bi bi-facebook"></i>
+            </a>
+            <a href="https://telegram.me/share/url?url={{ request.build_absolute_uri }}&text={{ product.name }}" target="_blank" class="social-icon-btn" title="Share on Telegram">
+              <i class="bi bi-telegram"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Specifications & Accordions -->
+        <div class="accordion accordion-flush border rounded-3 overflow-hidden shadow-sm" id="productAccordion">
+          <!-- Specs -->
+          {% if product.specifications %}
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button font-heading fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpecs">
+                  <i class="bi bi-info-circle me-2 text-primary"></i> Product Specifications
+                </button>
+              </h2>
+              <div id="collapseSpecs" class="accordion-collapse collapse show" data-bs-parent="#productAccordion">
+                <div class="accordion-body small text-muted">
+                  <ul class="mb-0 ps-3">
+                    {% for line in product.specifications.splitlines %}
+                      {% if line %}<li>{{ line }}</li>{% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Shipping -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed font-heading fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShipping">
+                <i class="bi bi-truck me-2 text-success"></i> Pan-India Shipping & Vault Handling
+              </button>
+            </h2>
+            <div id="collapseShipping" class="accordion-collapse collapse" data-bs-parent="#productAccordion">
+              <div class="accordion-body small text-muted">
+                <p class="mb-2"><strong>Complimentary Express Courier:</strong> Available on all orders over ₹4,999 across India (Delhivery, BlueDart, Bluedart Apex, DTDC).</p>
+                <p class="mb-0"><strong>Double-Boxed Guarantee:</strong> Every pair arrives in museum-grade, dent-free condition with tamper-evident QR verification security seals.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Returns -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed font-heading fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReturns">
+                <i class="bi bi-arrow-return-left me-2 text-warning"></i> 30-Day Authenticated Returns
+              </button>
+            </h2>
+            <div id="collapseReturns" class="accordion-collapse collapse" data-bs-parent="#productAccordion">
+              <div class="accordion-body small text-muted">
+                <p class="mb-0">We accept returns on unworn items in original packaging within 30 days of delivery. The SoleVault security tag must remain intact and attached.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Chart Modal (Indian / UK Sizing with Centimeters) -->
+  <div class="modal fade" id="sizeChartModal" tabindex="-1" aria-labelledby="sizeChartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-dark text-white p-4">
+          <div>
+            <h5 class="modal-title font-heading fw-bold text-white mb-0" id="sizeChartModalLabel">
+              <i class="bi bi-rulers text-warning me-2"></i> INDIAN / UK SNEAKER SIZE CHART
+            </h5>
+            <span class="small text-white-50">Accurate foot length conversion in Centimeters (CM)</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Size Chart Table -->
+          <div class="table-responsive mb-4">
+            <table class="table table-hover table-bordered text-center align-middle small">
+              <thead class="table-dark">
+                <tr>
+                  <th class="py-3">UK / India Size</th>
+                  <th class="py-3">US Men's</th>
+                  <th class="py-3">EU Size</th>
+                  <th class="py-3 text-warning">Foot Length (CM)</th>
+                  <th class="py-3">Fit Advice</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>UK 6</strong></td>
+                  <td>US 7</td>
+                  <td>EU 40</td>
+                  <td class="fw-bold text-dark bg-light">25.0 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 6.5</strong></td>
+                  <td>US 7.5</td>
+                  <td>EU 40.5</td>
+                  <td class="fw-bold text-dark bg-light">25.5 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 7</strong></td>
+                  <td>US 8</td>
+                  <td>EU 41</td>
+                  <td class="fw-bold text-dark bg-light">26.0 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 7.5</strong></td>
+                  <td>US 8.5</td>
+                  <td>EU 42</td>
+                  <td class="fw-bold text-dark bg-light">26.5 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr class="table-warning">
+                  <td><strong>UK 8 (Most Popular)</strong></td>
+                  <td>US 9</td>
+                  <td>EU 42.5</td>
+                  <td class="fw-bold text-dark">27.0 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 8.5</strong></td>
+                  <td>US 9.5</td>
+                  <td>EU 43</td>
+                  <td class="fw-bold text-dark bg-light">27.5 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr class="table-warning">
+                  <td><strong>UK 9 (Most Popular)</strong></td>
+                  <td>US 10</td>
+                  <td>EU 44</td>
+                  <td class="fw-bold text-dark">28.0 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 9.5</strong></td>
+                  <td>US 10.5</td>
+                  <td>EU 44.5</td>
+                  <td class="fw-bold text-dark bg-light">28.5 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 10</strong></td>
+                  <td>US 11</td>
+                  <td>EU 45</td>
+                  <td class="fw-bold text-dark bg-light">29.0 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 10.5</strong></td>
+                  <td>US 11.5</td>
+                  <td>EU 45.5</td>
+                  <td class="fw-bold text-dark bg-light">29.5 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 11</strong></td>
+                  <td>US 12</td>
+                  <td>EU 46</td>
+                  <td class="fw-bold text-dark bg-light">30.0 cm</td>
+                  <td>True to Size</td>
+                </tr>
+                <tr>
+                  <td><strong>UK 12</strong></td>
+                  <td>US 13</td>
+                  <td>EU 47.5</td>
+                  <td class="fw-bold text-dark bg-light">31.0 cm</td>
+                  <td>True to Size</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- How to measure foot instructions -->
+          <div class="card border-0 bg-light p-3 rounded-3">
+            <h6 class="font-heading fw-bold mb-2"><i class="bi bi-question-circle text-primary me-1"></i> How to Measure Your Foot in Centimeters (CM):</h6>
+            <ol class="small text-muted ps-3 mb-0">
+              <li class="mb-1">Place a blank sheet of paper on the floor against a flat wall.</li>
+              <li class="mb-1">Stand with your heel resting firmly against the wall.</li>
+              <li class="mb-1">Mark the longest point of your toes on the paper with a pencil.</li>
+              <li>Measure the distance from the edge of the paper to the pencil mark with a ruler in <strong>centimeters (CM)</strong>. Compare with the chart above!</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Reviews Section -->
+  <div class="py-5 my-4 border-top" id="reviewsSection">
+    <div class="row g-5">
+      <!-- Review Summary & Form -->
+      <div class="col-lg-4">
+        <div class="card border-0 bg-light p-4 rounded-4 shadow-sm mb-4">
+          <h4 class="font-heading fw-bold mb-3">Customer Feedback</h4>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="font-heading display-5 fw-bold text-dark">{{ product.average_rating }}</div>
+            <div>
+              <div class="text-warning fs-5">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+              </div>
+              <span class="small text-muted">Based on {{ product.total_reviews }} verified reviews</span>
+            </div>
+          </div>
+          <p class="small text-muted mb-0">100% of Indian buyers recommend this sneaker model for fit, comfort, and authenticity.</p>
+        </div>
+
+        <!-- Write Review Form -->
+        <div class="card border-0 bg-white p-4 rounded-4 shadow-sm">
+          <h5 class="font-heading fw-bold mb-3">Write a Review</h5>
+          {% if user.is_authenticated %}
+            <form method="POST">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Overall Rating</label>
+                {{ review_form.rating }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Headline / Title</label>
+                {{ review_form.title }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Your Experience</label>
+                {{ review_form.comment }}
+              </div>
+              <button type="submit" class="btn btn-vault w-100">Submit Review</button>
+            </form>
+          {% else %}
+            <div class="text-center py-3">
+              <i class="bi bi-person-lock fs-1 text-muted mb-2 d-block"></i>
+              <p class="small text-muted mb-3">Please sign in to your SoleVault account to leave a verified review.</p>
+              <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-vault-outline btn-vault-sm">Sign In to Review</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Reviews Listing -->
+      <div class="col-lg-8">
+        <h4 class="font-heading fw-bold mb-4">Reviews ({{ product.reviews.count }})</h4>
+        {% if product.reviews.all %}
+          <div class="d-flex flex-column gap-3">
+            {% for rev in product.reviews.all %}
+              <div class="card border-0 bg-white p-4 rounded-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold text-dark">{{ rev.user.first_name|default:rev.user.username }}</span>
+                    {% if rev.verified_buyer %}
+                      <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
+                        <i class="bi bi-check-circle-fill me-1"></i> Verified Buyer
+                      </span>
+                    {% endif %}
+                  </div>
+                  <span class="text-muted small">{{ rev.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="text-warning small mb-2">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= rev.rating %}
+                      <i class="bi bi-star-fill"></i>
+                    {% else %}
+                      <i class="bi bi-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                {% if rev.title %}
+                  <h6 class="font-heading fw-bold mb-1">{{ rev.title }}</h6>
+                {% endif %}
+                <p class="text-muted small mb-0">{{ rev.comment }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="bg-white p-5 rounded-4 text-center shadow-sm">
+            <i class="bi bi-chat-square-text fs-1 text-muted mb-2 d-block"></i>
+            <h6 class="font-heading fw-bold">Be the first to review this pair</h6>
+            <p class="text-muted small mb-0">Share your thoughts with India's sneaker community.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  {% if related_products %}
+    <div class="py-5 border-top">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <span class="text-muted text-uppercase small fw-bold letter-spacing-2">You May Also Admire</span>
+          <h3 class="font-heading fw-bold mb-0">RELATED SNEAKERS</h3>
+        </div>
+        <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="btn btn-vault-outline btn-vault-sm">
+          More {{ product.category.name }} <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="row g-4">
+        {% for rel in related_products %}
+          <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="product-card">
+              <a href="{% url 'product_detail' slug=rel.slug %}" class="product-card-img-wrap">
+                <img src="{{ rel.image.url }}" alt="{{ rel.name }}" loading="lazy">
+              </a>
+              <div class="product-card-body">
+                <span class="product-brand">{{ rel.brand.name }}</span>
+                <a href="{% url 'product_detail' slug=rel.slug %}" class="product-title">{{ rel.name }}</a>
+                <div class="product-price-box">
+                  <span class="product-price">₹{{ rel.current_price|floatformat:0 }}</span>
+                </div>
+                <a href="{% url 'product_detail' slug=rel.slug %}" class="btn btn-vault btn-vault-sm w-100">
+                  View Sneaker
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

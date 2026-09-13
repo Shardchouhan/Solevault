@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Details #{{ order.order_number }} — SoleVault India{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-2 small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'orders' %}">Orders</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ order.order_number }}</li>
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <h1 class="font-heading fw-bold mb-0">ORDER #{{ order.order_number }}</h1>
+        <span class="text-muted small">Placed on {{ order.created_at|date:"F d, Y \a\t g:i A" }}</span>
+      </div>
+      <button onclick="window.print()" class="btn btn-vault-outline btn-vault-sm">
+        <i class="bi bi-printer me-1"></i> Print Tax Invoice
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row g-4">
+    <!-- Left Col: Items & Status -->
+    <div class="col-lg-8">
+      <!-- Order Status Progress -->
+      <div class="card border-0 bg-white shadow-sm rounded-4 p-4 mb-4">
+        <h5 class="font-heading fw-bold mb-3">Order Status</h5>
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="badge bg-dark fs-6 px-3 py-2">{{ order.status }}</span>
+          <span class="text-muted small">| Courier Tracking: <strong class="text-primary">{{ order.tracking_number }}</strong></span>
+        </div>
+        <p class="text-muted small mb-0">
+          Your sneaker package has been authenticated in our laboratory and dispatched with double-box transit protection across India.
+        </p>
+      </div>
+
+      <!-- Items List -->
+      <div class="card border-0 bg-white shadow-sm rounded-4 p-4 mb-4">
+        <h5 class="font-heading fw-bold mb-3 pb-2 border-bottom">Purchased Items ({{ order.total_items }})</h5>
+        <div class="d-flex flex-column gap-3">
+          {% for item in order.items.all %}
+            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-light">
+              <div class="d-flex align-items-center gap-3">
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="rounded-2 bg-white p-2" style="width: 70px; height: 70px; object-fit: contain;">
+                <div>
+                  <span class="text-muted text-uppercase small fw-bold d-block">{{ item.product.brand.name }}</span>
+                  <a href="{% url 'product_detail' slug=item.product.slug %}" class="fw-bold text-dark d-block mb-1">{{ item.product.name }}</a>
+                  <span class="small text-muted">Size: <strong>{{ item.selected_size }}</strong> | Qty: {{ item.quantity }}</span>
+                </div>
+              </div>
+              <div class="text-end">
+                <strong class="font-heading fs-6">₹{{ item.subtotal|floatformat:0 }}</strong>
+                <span class="d-block small text-muted">(₹{{ item.price|floatformat:0 }} ea)</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Col: Financials & Shipping Destination -->
+    <div class="col-lg-4">
+      <div class="card border-0 bg-white shadow-sm rounded-4 p-4 mb-4">
+        <h5 class="font-heading fw-bold mb-3 pb-2 border-bottom">Payment Summary</h5>
+        <div class="summary-row">
+          <span class="text-muted">Subtotal:</span>
+          <strong>₹{{ order.subtotal|floatformat:0 }}</strong>
+        </div>
+        {% if order.discount_amount > 0 %}
+          <div class="summary-row text-success">
+            <span>Discount Applied:</span>
+            <strong>-₹{{ order.discount_amount|floatformat:0 }}</strong>
+          </div>
+        {% endif %}
+        <div class="summary-row">
+          <span class="text-muted">Express Courier:</span>
+          <span>{% if order.shipping_cost == 0 %}<strong class="text-success">FREE</strong>{% else %}₹{{ order.shipping_cost|floatformat:0 }}{% endif %}</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total:</span>
+          <span class="text-dark">₹{{ order.total_amount|floatformat:0 }}</span>
+        </div>
+        <div class="pt-3 border-top mt-3 small text-muted">
+          <span>Payment Mode: <strong>{{ order.payment_method }}</strong></span><br>
+          <span>Payment Status: <span class="badge bg-success-subtle text-success">{{ order.payment_status }}</span></span>
+        </div>
+      </div>
+
+      <div class="card border-0 bg-white shadow-sm rounded-4 p-4">
+        <h5 class="font-heading fw-bold mb-3 pb-2 border-bottom">Delivery Destination</h5>
+        <p class="small text-muted mb-0">
+          <strong class="text-dark d-block mb-1">{{ order.full_name }}</strong>
+          {{ order.address }}<br>
+          {{ order.city }}, {{ order.state }} - {{ order.postal_code }}<br>
+          {{ order.country }}<br>
+          <span class="d-block mt-2"><strong>Phone:</strong> {{ order.phone }}</span>
+          <span><strong>Email:</strong> {{ order.email }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

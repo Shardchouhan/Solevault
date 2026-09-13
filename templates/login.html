@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In — SoleVault Member Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-3">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+      <div class="card border-0 bg-white shadow-lg rounded-4 p-4 p-md-5">
+        <div class="text-center mb-4">
+          <span class="text-muted text-uppercase small fw-bold letter-spacing-2">Member Access</span>
+          <h2 class="font-heading fw-bold mb-1">SIGN IN TO SOLEVAULT</h2>
+          <p class="text-muted small">Access your order history, wishlist, and private drops.</p>
+        </div>
+
+        <form method="POST" action="{% url 'login' %}">
+          {% csrf_token %}
+          {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label font-heading fw-bold small">Username or Email</label>
+            {{ form.username }}
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label font-heading fw-bold small mb-0">Password</label>
+              <a href="#" class="small text-muted text-decoration-underline" onclick="alert('Password reset link sent to registered email.'); return false;">Forgot?</a>
+            </div>
+            {{ form.password }}
+          </div>
+
+          <button type="submit" class="btn btn-vault btn-vault-lg w-100 mb-3">
+            Sign In
+          </button>
+        </form>
+
+        <!-- Demo Login Hint Box -->
+        <div class="bg-light p-3 rounded-3 border small text-muted mb-3">
+          <strong class="text-dark d-block mb-1"><i class="bi bi-key-fill text-warning me-1"></i> Demo Credentials:</strong>
+          <div>User: <code class="text-dark">jordan_fan</code> / Password: <code class="text-dark">password123</code></div>
+          <div>Admin: <code class="text-dark">admin</code> / Password: <code class="text-dark">admin123</code></div>
+        </div>
+
+        <div class="text-center pt-3 border-top">
+          <p class="text-muted small mb-0">
+            Don't have an account? <a href="{% url 'register' %}" class="fw-bold text-dark text-decoration-underline">Create Account</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
